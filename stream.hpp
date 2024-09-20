@@ -104,18 +104,11 @@ public:
             if (i < upper_bound) return true;
             else return false;
         }
-
+        return false;
     }
 
 };
 
-
-char char_process_string () {
-
-
-
-
-}
 
 
 
