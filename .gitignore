@@ -1,5 +1,6 @@
 ## xcode 
 my library.xcodeproj
 
-## 
+## mac
 .idea
+.DS_Store
