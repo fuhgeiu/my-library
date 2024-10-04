@@ -5,7 +5,7 @@ my library.xcodeproj
 .idea
 .DS_Store
 *.DS_Store
-include/*.DS_Store
+include/.DS_Store
 
 ## executables
 test_stream
