@@ -4,6 +4,7 @@ my library.xcodeproj
 ## mac
 .idea
 .DS_Store
+*.DS_Store
 
 ## executables
 test_stream
