@@ -3,9 +3,9 @@ my library.xcodeproj
 
 ## mac
 .idea
-.DS_Store
 *.DS_Store
 include/.DS_Store
+idea/
 
 ## executables
 test_stream
