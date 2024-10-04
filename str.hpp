@@ -45,14 +45,7 @@ class string {
 public:
     string () {};
 
-    string (const char* string) {                           // constructor
-
-        setstring(string);
-    }
-
-
-
-
+    string (const char* string)  { setstring(string); }                            // constructor (string literal)
 
     const char& operator[] (size_t index) const { return *(m_data + index);}             // index return as const
 
@@ -71,6 +64,24 @@ public:
         // move semantics
 
 
+
+    }
+
+    void alloc () {
+
+        string *tempcontainer = new string();
+
+
+
+    }
+
+    void append (const char* to_append) {
+
+        // allo new memeory,
+        alloc();
+
+        // move data
+        memcpy();
 
     }
 
