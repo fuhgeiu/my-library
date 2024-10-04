@@ -7,8 +7,4 @@ my library.xcodeproj
 include/.DS_Store
 idea/
 
-## executables
-test_stream
-test_str
-test_container
-test_search functions
+
