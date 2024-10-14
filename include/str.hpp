@@ -4,9 +4,29 @@
 
     STRING CLASS
 
-    strstd::string, non template class to store strings in a character array           line 40
+    strstd::string          non template class to store char in a dynamically allocated container        line 40
+ 
+    CONSTRUCTORS
+ 
+    1) string ()
+    
+    ____________________________________________________________________________________________________________
+ 
+ 
 
-    MEMBERS
+    PUBLIC MEMBERS
+ 
+    1) setstring ()
+ 
+    2) void print ()
+ 
+    3) char* sequence ()
+ 
+    4) void append ()
+ 
+    _____________________________________________________________________________________________________________
+    
+    
 
 
 
@@ -29,50 +49,108 @@
     3) compare string literal to array. pass in pointer to array
     4) compare string literal with a string object. (compare to, object to compare with, index where begin search)
        return type int, returns 0, if comparision is true. return -1, if comparision false
-
 */
 
 namespace strstd{
 
 size_t strlength (const char*);                            // declare to use in class and other members
 
-// very redumentary string class
+// very redumentary string class, class container will only allocate the space needed to append with or construct with
 class string {
 
-    char* m_data = nullptr;                                  // char pointer for object/container
-    size_t m_size;                                          //  size in terms of unsigned int w/o null char
+    char* m_data = nullptr;                                   // char pointer for object/container
+    size_t m_length;                                          //  size without null char
+    size_t m_length_null;                                     //  size with null char
+    
+    
+// cd_length is number of char to store
+// note, although the sizeof char is 1, still included sizeof() for good practice
+    
+    void alloc (size_t cd_length) {                                 // alocate more memory, by number of char, not in terms of bytes
+        
+        char* mem_block = static_cast<char*>(::operator new (sizeof(char) * (cd_length + m_length)));  // cd_length = number of char to alloc
+                                              
+        for (size_t i = 0; i < m_length; i++) {mem_block[i] = std::move(m_data[i]);}          // copy over current char to new_block
+        
+        if (m_data != nullptr) {operator delete (m_data, sizeof(char) * m_length);}                  // deallocate old allocation
+
+        m_data = mem_block;                                        // assign block of memory with space allocated by amount of char, to m_data
+        m_length = (cd_length + m_length);                         // change length of m_data to the length of new allocation mem_block
+    }
+    
+    void alloc_null (size_t cd_length) {                     // allocate more memory, also include a null char
+        
+        char* mem_block = static_cast<char*>(::operator new ((cd_length + m_length + 1) * sizeof(char)));
+        
+        for (size_t i = 0; i < m_length; i++) { if (m_data[i] != '\n') {mem_block[i] = std::move(m_data[i]);}} // !warning does not copy \n
+        
+        if (m_data != nullptr) {operator delete (m_data, sizeof(char) * m_length);}                  // deallcate old allocation
+        
+        m_data = mem_block;
+        m_length = (cd_length + m_length);                                          // update length without null char
+        m_length_null = (cd_length + m_length +1);                                  // update length including null char
+    }
+    
+    void realloc (size_t cd_length) {                       // shrink container
+        
+//        operator delete ();                                          // deallocate segment of container
+        
+        m_length = m_length - cd_length;                    // update the length of the container
+    }
+    
 
 public:
     
     string () = default;
 
-    string (const char* string)  {setstring(string);}                   // constructor (string literal)
+    string (const char* string) {
+        
+        strlength(string);                          // returns length of string in terms of numbers of char, not including the null character
+        // alloc new memory
+        // assign the string literal chars to each memory spot, take r value and assign to l value
+        // add a null char to the string
+        
+        
+        
+    }                           // constructor for instantiation of a string literal
 
     const char& operator[] (size_t index) const { return *(m_data + index);}             // index return as const
 
-    size_t length () const { return (m_size);}                          // return number of elments, no null char
-    size_t abslength () const { return (m_size+1);}                     // return number of elements, including null
-
-    char& operator[] (size_t index) { return *(m_data + index);}                     // index
+    size_t length () const { return (m_length);}                          // return number of elments, no null char
+    size_t abslength () const { return (m_length+1);}                     // return number of elements, including null
+    
+    char& operator[] (size_t index) {return *(m_data + index);}           // warning! can be used to change m_data
+    
+    // index operator to return a const char
+    // const index operator to return a const char
 
     void setstring (const char* string){
 
-        m_size = strlength(string);                        // get the size of passed string w/o null char
-        m_data = new char[m_size];                         // allocate new memory by passing in size of space needed
+        m_length = strlength(string);                        // get the size of passed string w/o null char
+        m_data = new char[m_length];                         // allocate new memory by passing in size of space needed
 
-        memcpy(m_data, string, m_size);         // copy (destination, source, size (number of bytes))
+        memcpy(m_data, string, m_length);         // copy (destination, source, size (number of bytes))
 
         // move semantics
 
+    }
+    
+    void append (const char* append_data) {
+        
+// alloc more memory
+        
+        size_t cd_length = strlength(append_data);                               // length of data we append, no null character included
+        alloc(cd_length+1);                                                      // +1 to include null char
+        
+// move/copy append_data into container
         
         
         
-
     }
 
     void print () {
 
-        for (size_t i = 0; i < m_size; i++) { std::cout << m_data[i]; }     // does not print null char
+        for (size_t i = 0; i < m_length; i++) { std::cout << m_data[i]; }     // does not print null char
     }
 
     char* sequence (int i, size_t length) {             // to get a section of string and return new array ptr
@@ -81,7 +159,7 @@ public:
 
         memcpy(m_store,m_data,(length * sizeof(char)));
 
-        return std::move(m_store);                      // move char* to array
+        return m_store;                      // move char* to array
     }
     
     // append member
