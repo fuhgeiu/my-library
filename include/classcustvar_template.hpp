@@ -68,9 +68,8 @@ private:
         
         for (size_t i = 0; i < cd_size; i++) {cd_data[i].~T();}                         // call destructors for each element
         
-        operator delete(cd_data, cd_capacity * sizeof(T));        // delete operator on object type T
+        operator delete(cd_data, cd_capacity * sizeof(T));
         
-//        delete[] cd_data;                                 // delete from where we moved data from
         cd_data = newBlock;                               // assign pointer to block of meory where data was moved to
         cd_capacity = newCapacity;                        // assign a capacity based on block of memory we moved data to
     }
