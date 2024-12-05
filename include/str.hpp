@@ -62,14 +62,15 @@ class string {
     size_t m_length;                                          //  size without null char
     size_t m_length_null;                                     //  size with null char
     
-    
 // cd_length is number of char to store
 // note, although the sizeof char is 1, still included sizeof() for good practice
     
     void alloc (size_t cd_length) {                                 // alocate more memory, by number of char, not in terms of bytes
         
         char* mem_block = static_cast<char*>(::operator new (sizeof(char) * (cd_length + m_length)));  // cd_length = number of char to alloc
-                                              
+        auto mem_block2 = (char*) ::operator new (m_length * sizeof(char*));
+        
+        
         for (size_t i = 0; i < m_length; i++) {mem_block[i] = std::move(m_data[i]);}          // copy over current char to new_block
         
         if (m_data != nullptr) {operator delete (m_data, sizeof(char) * m_length);}                  // deallocate old allocation
@@ -151,6 +152,7 @@ public:
     void print () {
 
         for (size_t i = 0; i < m_length; i++) { std::cout << m_data[i]; }     // does not print null char
+        std::cout << m_data[0] << m_data[1];
     }
 
     char* sequence (int i, size_t length) {             // to get a section of string and return new array ptr
@@ -237,5 +239,7 @@ int strcompare (const char* string, strstd::string look, size_t begin) {   // st
 // use move sematics when passing in string literal, and for locating member(passing in literal)
 // update destructor
 // add append to string
+// add emplace back 
 // update constructor to a , copy and assignment constructor and move constructor
 // add more useful methods
+// need to be able to use refernces for constructing

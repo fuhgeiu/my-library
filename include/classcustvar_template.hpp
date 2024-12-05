@@ -43,54 +43,81 @@ public:
     T* arraypointer () { return m_fixedcont; }                                  // return pointer to array
 };
 
-//template<int S, typename T> void mydataT<S,T>::getsay(){}
-
 
 
 // dynamic container
 template <typename T>
-class contdynamic {
+struct contdynamic {
     
-    T* cd_data = nullptr;               // pointer to contiguous memory block
+    T* cd_data = nullptr;
     
-    size_t  cd_size = 0;                // used amount of container
-    size_t cd_capacity = 0;             // capacity of container
+    size_t  cd_size = 0;
+    size_t cd_capacity = 0;
     
 private:
-            
-    void Calloc (size_t newCapacity){                                                    // allocating and reallocating memeory
-        
-        T* newBlock = (T*)::operator new (newCapacity* sizeof(T));                      // allocate a block of memory
-        
-        if (newCapacity < cd_size) cd_size = newCapacity;                              // for reducing container size to a new capacity
-        
-        for (size_t i = 0; i < cd_size; i++) {newBlock[i] = std::move(cd_data[i]);}                 //move cd_data elements to newblock
-        
-        for (size_t i = 0; i < cd_size; i++) {cd_data[i].~T();}                         // call destructors for each element
-        
-        operator delete(cd_data, cd_capacity * sizeof(T));
-        
-        cd_data = newBlock;                               // assign pointer to block of meory where data was moved to
-        cd_capacity = newCapacity;                        // assign a capacity based on block of memory we moved data to
+    
+    void allocate (size_t newCapacity, size_t multiplier) {             // (to be allocated, multiplier) multiplier adjustable
+
+        T* newblock = static_cast<T*>(::operator new ((newCapacity+cd_capacity) * sizeof(T) * multiplier));
+
+        for (size_t i = 0; i < cd_size; i++) {newblock[i] = std::move(cd_data[i]);}         // move stuff to newblock
+
+        for (size_t i = 0; i < cd_capacity; i++) {cd_data[i].~T();}                       // only when T is not an pointer
+
+        operator delete(cd_data);                                               // deallocate the current block of data stored in container
+
+        cd_data = newblock;                                                              // asign container to newly allcoated block
+        cd_capacity = ((newCapacity+cd_capacity)*1.5);                                   // assign new lenght of newly allocated block
     }
+    
+    void allocate (size_t newCapacity) {                                    // (to be allocated)  multiplier is 1.5
+
+        T* newblock = static_cast<T*>(::operator new ((newCapacity+cd_capacity) * sizeof(T) * 1.5));
+
+        for (size_t i = 0; i < cd_size; i++) {(newblock[i]) = std::move(cd_data[i]);}
+
+        for (size_t i = 0; i < cd_capacity; i++) {cd_data[i].~T();}                        // only when T is not an pointer
+
+        operator delete(cd_data);                                              // deallocate the current block of data stored in container
+        
+        cd_data = newblock;                                             // asign container to newly allcoated block
+        cd_capacity = ((newCapacity+cd_capacity)*1.5);                  // assign new lenght of newly allocated block
+    }
+    
+    void allocate () {
+
+        size_t newCapacity = 5;
+
+        T* newblock = static_cast<T*>(::operator new ((newCapacity+cd_capacity) * sizeof(T) * 1.5));
+
+        for (size_t i = 0; i < cd_size; i++) {(newblock[i]) = std::move(cd_data[i]);}
+
+        for (size_t i = 0; i < cd_capacity; i++) {cd_data[i].~T();}                        // destruct current block of obejcts
+
+        operator delete(cd_data);
+        
+        cd_data = newblock;
+        cd_capacity = (newCapacity*1.5);
+    }
+    
     
 public:
     
-    contdynamic() {Calloc(0);}                   // default constructor allocate for 2 slots
+    contdynamic() {allocate(2);}                   // default constructor allocate 2*1.5
     
     ~contdynamic() {                                        // destructor
-        
-        clear();                                                 // call destructer for typ T each elment
-        operator delete(cd_data, cd_capacity * sizeof(T));    // deallocate each spot in memory
+
+        for (size_t i = 0; i < cd_capacity; i++) {cd_data[i].~T();}                        // destruct current block of obejcts
+
+        operator delete(cd_data);
     }
     
     void append(const T& element) {
         
         if (cd_size >= cd_capacity){                         // to increase available container space
             
-            Calloc(cd_capacity + cd_size / 2);                  // allocate 1.5 times memory size
+            allocate(cd_size*3/2);
         }
-        std::cout << "appned T& called";
         
         cd_data[cd_size] = element;                         // copy data to apped onto container and assign
         cd_size++;                                          // increment size
@@ -100,45 +127,45 @@ public:
         
         if (cd_size >= cd_capacity){                         // to increase available container space
             
-            Calloc(cd_capacity + cd_size / 2);   // allocate 1.5 times memory size
+            allocate(cd_size*3/2);
         }
-        std::cout << "append T&& called" << " element->" << element;
         
-        cd_data[cd_size] = std::move(element);              // move data to apped onto container and assign
+        cd_data[cd_size] = element;                         // copy data to apped onto container and assign
         cd_size++;                                          // increment size
     }
     
-    void popback() {                                      // to destruct and deallocate last element
-        if (cd_size > 0) {                                  // only when container is bigger than zero
-
-            cd_size--;
-            cd_data[cd_size].~T();                          // destruct array over size of array and not the capacity
-        }                                                    // of the array, as some may not have data stored
-        else std::cout << "WARNING ATTEMPT TO POP BACK A CONTAINER OF NO DATA FAILED\n";
-    }
+    void popback() { cd_data[cd_size-1].~T(); cd_size -= 1;}
     
-    void clear() {                                                    // to clear each element
-        
-        for (size_t i = 0; i < cd_size; i++) { cd_data[i].~T(); }     // itterate over container, destruct each element
-        cd_size = 0;
-    }
+    void print () {for (size_t i = 0; i < cd_size; i++) std::cout << cd_data[i];}
     
-    void print () {
-        
-        for (size_t i = 0; i < cd_size; i++) std::cout << cd_data[i];
-        
-    }
+    const size_t length() const {return cd_size;}                                   // return size of container
     
-    size_t length() const {return cd_size;}                                   // return size of container
+    const size_t size() const {return cd_size * sizeof(T);}
     
-    const size_t length() {return cd_size;}
+    const T& operator[](size_t index) const {return cd_data[index % cd_size];}   // return const ref to index
     
-    const size_t size() {return cd_size * sizeof(T);}
-    
-    const T& operator[](size_t index) const  { return cd_data[index % cd_size]; }   // return refernce to data at index, const function
-    
-    T& operator[] (size_t index)  { return cd_data[index % cd_size]; }   // return refrence to data at index
+    T& operator[] (size_t index)  {return cd_data[index % cd_size];}   // return refrence to data at index
     
 };
 
 }
+
+/*  things to add
+ 
+ add a stream operator overload
+ 
+ add exception handling
+ 
+ add peek
+ 
+ change allocate funciton, it dosnt shrink currently
+ 
+ 
+ 
+ 
+ 
+ add documentation
+ 
+ */
+
+
