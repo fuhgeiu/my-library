@@ -62,8 +62,10 @@ private:
 
         for (size_t i = 0; i < cd_size; i++) {newblock[i] = std::move(cd_data[i]);}         // move stuff to newblock
 
+        // call when the type T is not a pointer
         for (size_t i = 0; i < cd_capacity; i++) {cd_data[i].~T();}                       // only when T is not an pointer
 
+        // call when type T is a pointer, to call destructor and deallocate the pointer
         operator delete(cd_data);                                               // deallocate the current block of data stored in container
 
         cd_data = newblock;                                                              // asign container to newly allcoated block
@@ -107,9 +109,9 @@ public:
     
     ~contdynamic() {                                        // destructor
 
-        for (size_t i = 0; i < cd_capacity; i++) {cd_data[i].~T();}                        // destruct current block of obejcts
+        for (size_t i = 0; i < cd_capacity; i++) {cd_data[i].~T();}       // call when type T is not a pointer call destructors for each element
 
-        operator delete(cd_data);
+        operator delete(cd_data);                                         // call when type T is a pointer, calls destructors and deallocates pointer
     }
     
     void append(const T& element) {
@@ -134,7 +136,7 @@ public:
         cd_size++;                                          // increment size
     }
     
-    void popback() { cd_data[cd_size-1].~T(); cd_size -= 1;}
+    void popback() { cd_data[cd_size-1].~T(); cd_size -= 1;}        // change pop back to delete the pointer refernce
     
     void print () {for (size_t i = 0; i < cd_size; i++) std::cout << cd_data[i];}
     
@@ -151,6 +153,8 @@ public:
 }
 
 /*  things to add
+ 
+ add interface
  
  add a stream operator overload
  

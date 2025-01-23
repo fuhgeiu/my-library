@@ -1,8 +1,9 @@
 #include <iostream>
 #include "str.hpp"
 #include "classcustvar_template.hpp"
-#include "mem_view.hpp"
 #include <cassert>
+
+
 
 class temp {
     
@@ -62,44 +63,91 @@ int main () {
     dynamic->popback();
     dynamic->popback();
     
-//    assert((*dynamic)[8] == 4);
-//    assert((*dynamic)[9] == 5);
-    
-    std::cout << std::endl << std::endl;
-    
     dynamic->print();
     
-    std::cout << std::endl << std::endl;
     
-    std::cout << dynamic->cd_size;
-    
-    std::cout << std::endl << std::endl << std::endl << std::endl;
-    
-    
-    // test user defined data types
+    // test heap allocated objects
+    // t0-t9
     
     auto *class_test = new cstd::contdynamic<temp>;
     
     temp t1(1);
     temp t2(6);
+    temp t3(9);
+    temp t4(400);
     
     class_test->append(t1);
     class_test->append(t2);
+    class_test->append(t3);
+    class_test->append(t4);
     
     assert((*class_test)[0].ret_i() == 1);
     assert((*class_test)[1].ret_i() == 6);
+    assert((*class_test)[2].ret_i() == 9);
+    assert((*class_test)[3].ret_i() == 400);
     
     
+    // test heap allocated object pointers
+    // t_0 - t_1
     auto *class_testp = new cstd::contdynamic<temp*>;
     
-    auto *t3 = new temp(3);
-    auto *t4 = new temp(6);
+    auto *t_0 = new temp(3);
+    auto *t_1 = new temp(6);
+    auto *t_2 = new temp(500);
+    auto *t_3 = new temp(9);
     
-    class_testp->append(t3);
-    class_testp->append(t4);
+    class_testp->append(t_0);
+    class_testp->append(t_1);
+    class_testp->append(t_2);
+    class_testp->append(t_3);
     
     assert((*class_testp)[0]->ret_i() == 3);
     assert((*class_testp)[1]->ret_i() == 6);
+    assert((*class_testp)[2]->ret_i() == 500);
+    assert((*class_testp)[3]->ret_i() == 9);
+    
+    
+    // stack allocated objects
+    // t1_0 - t1_9
+    cstd::contdynamic<temp> test5;
+    
+    temp t1_0(99);
+    temp t1_1(30);
+    temp t1_2(44);
+    temp t1_3(33);
+    
+    test5.append(t1_0);
+    test5.append(t1_1);
+    test5.append(t1_2);
+    test5.append(t1_3);
+    
+    assert(test5[0].ret_i() == 99);
+    assert(test5[1].ret_i() == 30);
+    assert(test5[2].ret_i() == 44);
+    assert(test5[3].ret_i() == 33);
+    
+    
+    // stack alocated object pointers
+    // t2_0 - t2_9
+    
+    cstd::contdynamic<temp*> test6;
+    
+    auto *t2_0 = new temp(33);
+    auto *t2_1 = new temp(34);
+    auto *t2_2 = new temp(89);
+    auto *t2_3 = new temp(29);
+    
+    test6.append(t2_0);
+    test6.append(t2_1);
+    test6.append(t2_2);
+    test6.append(t2_3);
+    
+    assert(test6[0]->ret_i() == 33);
+    assert(test6[1]->ret_i() == 34);
+    assert(test6[2]->ret_i() == 89);
+    assert(test6[3]->ret_i() == 29);
+    
+    
     
     
 //    allocation will only happen in size_t, ie if use 3 for allocation, even tho the allocation is 3*1.5 = 4.5, the capacity will be 4
