@@ -114,6 +114,8 @@ public:
         operator delete(cd_data);                                         // call when type T is a pointer, calls destructors and deallocates pointer
     }
     
+    bool is_empty () {return cd_size == 0;}
+    
     void append(const T& element) {
         
         if (cd_size >= cd_capacity){                         // to increase available container space

@@ -23,6 +23,7 @@ public:
 int main () {
     
 //test basic functions of the container
+//test the empty func works
     
     auto *dynamic = new cstd::contdynamic<int>;
 
@@ -65,6 +66,9 @@ int main () {
     
     dynamic->print();
     
+    for (size_t i = 0; i < 8; i++) {dynamic->popback();}
+    
+    assert(dynamic->is_empty() == true);
     
     // test heap allocated objects
     // t0-t9
@@ -86,6 +90,10 @@ int main () {
     assert((*class_test)[2].ret_i() == 9);
     assert((*class_test)[3].ret_i() == 400);
     
+    for (size_t i = 0; i < 4; i++) {class_test->popback();}
+    
+    assert(dynamic->is_empty() == true);
+    
     
     // test heap allocated object pointers
     // t_0 - t_1
@@ -105,6 +113,10 @@ int main () {
     assert((*class_testp)[1]->ret_i() == 6);
     assert((*class_testp)[2]->ret_i() == 500);
     assert((*class_testp)[3]->ret_i() == 9);
+    
+    for (size_t i = 0; i < 4; i++) {class_testp->popback();}
+    
+    assert(class_testp->is_empty() == true);
     
     
     // stack allocated objects
@@ -126,6 +138,10 @@ int main () {
     assert(test5[2].ret_i() == 44);
     assert(test5[3].ret_i() == 33);
     
+    for (size_t i = 0; i < 4; i++) {test5.popback();}
+    
+    assert(test5.is_empty() == true);
+    
     
     // stack alocated object pointers
     // t2_0 - t2_9
@@ -146,6 +162,10 @@ int main () {
     assert(test6[1]->ret_i() == 34);
     assert(test6[2]->ret_i() == 89);
     assert(test6[3]->ret_i() == 29);
+    
+    for (size_t i = 0; i < 4; i++) {test6.popback();}
+    
+    assert(test6.is_empty() == true);
     
     
     
